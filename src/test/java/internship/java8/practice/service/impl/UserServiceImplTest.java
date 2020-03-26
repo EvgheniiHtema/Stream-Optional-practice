@@ -5,8 +5,11 @@ import internship.java8.practice.domain.User;
 import internship.java8.practice.service.UserService;
 import org.junit.Test;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.function.Predicate;
 
@@ -14,6 +17,8 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.entry;
 
 @SuppressWarnings("unchecked")
@@ -30,7 +35,7 @@ public class UserServiceImplTest {
         final User user3 = new User(3L, "Alex", "Smith", 13, ALL_PRIVILEGES);
 
         final List<String> sortedFirstNames =
-            userService.getFirstNamesReverseSorted(asList(user1, user2, user3));
+                userService.getFirstNamesReverseSorted(asList(user1, user2, user3));
 
         assertThat(sortedFirstNames).containsExactly("John", "Greg", "Alex");
     }
@@ -210,4 +215,42 @@ public class UserServiceImplTest {
                 .contains(entry("Smith", 2L), entry("Jonson", 1L));
     }
 
+    @Test
+    public void shouldReturnUserIfDoesntExistThrowsException() {
+        final User user1 = new User(1L, "John", "Smith", 26, singletonList(Privilege.UPDATE));
+        final User user2 = new User(2L, "Greg", "Jonson", 30, asList(Privilege.UPDATE, Privilege.CREATE, Privilege.DELETE));
+        final User user3 = new User(3L, "Alex", "Smith", 13, singletonList(Privilege.DELETE));
+
+        assertThatCode(() -> userService.isUserWithCurrentAgeExist(asList(user1, user2, user3), 30))
+                .doesNotThrowAnyException();
+        assertThatThrownBy(() -> userService.isUserWithCurrentAgeExist(asList(user1, user2, user3), 42))
+                .isInstanceOf(NoSuchElementException.class);
+        assertThatThrownBy(() -> userService.isUserWithCurrentAgeExist(Collections.emptyList(), 42))
+                .isInstanceOf(NoSuchElementException.class);
+    }
+
+    @Test
+    public void shouldReturnStringOfUsersFirstnameAndLastnameOrUnknown() {
+        final String unknown = "Unknown";
+        final User user1 = new User(1L, "John", "Smith", 26, singletonList(Privilege.UPDATE));
+        final User user2 = new User(1L, null, "Smith", 26, singletonList(Privilege.UPDATE));
+        final User user3 = new User(1L, "Greg", null, 26, singletonList(Privilege.UPDATE));
+        final User user4 = null;
+
+        assertThat(userService.getUserFirstNameAndLastName(Optional.ofNullable(user1))).isEqualTo("John Smith");
+        assertThat(userService.getUserFirstNameAndLastName(Optional.ofNullable(user2))).isEqualTo(unknown);
+        assertThat(userService.getUserFirstNameAndLastName(Optional.ofNullable(user3))).isEqualTo(unknown);
+        assertThat(userService.getUserFirstNameAndLastName(Optional.ofNullable(user4))).isEqualTo(unknown);
+    }
+
+    @Test
+    public void shouldCountHowManyPrivilegesExist() {
+        final User user1 = new User(1L, "John", "Smith", 26, Arrays.asList(Privilege.UPDATE, Privilege.CREATE, Privilege.READ, Privilege.DELETE));
+        final User user2 = new User(2L, "Alex", "Johnson", 26, Arrays.asList(Privilege.UPDATE, Privilege.CREATE, Privilege.READ));
+        final User user3 = new User(3L, "Greg", "Jackson", 26, Arrays.asList(Privilege.UPDATE, Privilege.CREATE));
+        final User user4 = new User(4L, "Daniel", "Freman", 26, Arrays.asList(Privilege.UPDATE));
+        final User user5 = new User(5L, "Daniel", "Freman", 26, Collections.emptyList());
+
+        assertThat(userService.countHowMuchPrivilegesAllUsersHave(Arrays.asList(user1, user2, user3, user4, user5))).isEqualTo(10L);
+    }
 }

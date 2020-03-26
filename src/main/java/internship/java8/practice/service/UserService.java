@@ -5,6 +5,7 @@ import internship.java8.practice.domain.User;
 
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -111,6 +112,36 @@ public interface UserService {
      * @return map of last names and encountered number
      */
     Map<String, Long> getNumberOfLastNames(final List<User> users);
+
+    /**
+     * 1 to 11 exercises in top are imported from repository https://github.com/en-internship/java8-practice
+     */
+
+    /**
+     * If participant exist return true, else throws exception
+     *
+     * @param users list of users
+     * @param age conditional age
+     * @return user if user with age exists
+     * @throws NoSuchElementException if user doesn't exist
+     */
+    User isUserWithCurrentAgeExist(final List<User> users, int age);
+
+    /**
+     *
+     * Should return Concatenated First name and Last name or Unknown if values is missing
+     * @param user current user
+     * @return Concatenated string of First name and Last name or Unknown
+     */
+    String getUserFirstNameAndLastName(Optional<User> user);
+
+    /**
+     *
+     * Should return number of all Privileges that users have
+     * @param users current users
+     * @return number of privileges
+     */
+    long countHowMuchPrivilegesAllUsersHave(List<User> users);
 }
 
 

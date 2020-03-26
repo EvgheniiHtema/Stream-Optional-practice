@@ -1,8 +1,8 @@
 package internship.java8.practice.service.impl;
 
-import internship.java8.practice.service.UserService;
 import internship.java8.practice.domain.Privilege;
 import internship.java8.practice.domain.User;
+import internship.java8.practice.service.UserService;
 
 import java.util.List;
 import java.util.Map;
@@ -64,6 +64,21 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Map<String, Long> getNumberOfLastNames(final List<User> users) {
+        throw new UnsupportedOperationException("Not implemented");
+    }
+
+    @Override
+    public User isUserWithCurrentAgeExist(List<User> users, int age) {
+        throw new UnsupportedOperationException("Not implemented");
+    }
+
+    @Override
+    public String getUserFirstNameAndLastName(Optional<User> users) {
+        throw new UnsupportedOperationException("Not implemented");
+    }
+
+    @Override
+    public long countHowMuchPrivilegesAllUsersHave(List<User> users) {
         throw new UnsupportedOperationException("Not implemented");
     }
 }
